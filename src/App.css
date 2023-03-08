@@ -45,6 +45,20 @@
 
 svg{
   width: 20px;
+  z-index: 2;
+    /* background-color: red;
+      position: relative;
+      animation: mymove 5s infinite; */
+}
+
+@keyframes mymove {
+  from {
+    top: 0px;
+  }
+
+  to {
+    top: -200px;
+  }
 }
 
 button{
