@@ -1,8 +1,12 @@
+import React from "react";
 import { useEffect, useState } from "react";
 import { idText } from "typescript";
-import { elevator } from "./Building";
+import { elevator } from "../type";
 
 function Elevator({ available, color, floor, index, destinyFloor }: elevator) {
+  // ,
+  // ref
+
   //   const [elevator, setElevator] = useState<elevator>({
   //     available,
   //     color,
@@ -23,12 +27,17 @@ function Elevator({ available, color, floor, index, destinyFloor }: elevator) {
   //   }, []);
   return (
     <svg
-      style={{
-        fill: color,
-        transform: `translateY(${t}px)`,
-        transitionDuration: `${Math.abs(t) * 5}ms`,
-        animationTimingFunction: "linear",
-      }}
+      // ref={ref}
+      style={
+        true && {
+          fill: color,
+          transform: `translateY(${t}px)`,
+          transitionDuration: `${Math.abs(t) * 5}ms`,
+          animationTimingFunction: "linear",
+          // zIndex
+          // animationFillMode: "forwards",
+        }
+      }
       //   xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 50 50"
       //   fill="#000000"

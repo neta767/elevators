@@ -87,5 +87,5 @@ box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.096);
 .arrived{
   background-color: transparent;
   color: green;
-  border: 1px green;
+  border: 1px solid green;
 }
