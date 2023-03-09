@@ -11,7 +11,7 @@ function App() {
     <div className="App">
       <h1>Elevator Exercise</h1>
       {!startBuilding ? (
-        <>
+        <form onSubmit={(e) => setStartBuilding(true)}>
           <label>
             Number Of Elevators:
             <input
@@ -34,12 +34,8 @@ function App() {
               onChange={(e) => setFloorsNumber(parseInt(e.target.value))}
             />
           </label>
-          <input
-            type="submit"
-            value="Submit"
-            onClick={(e) => setStartBuilding(true)}
-          ></input>
-        </>
+          <input type="submit" value="Submit"></input>
+        </form>
       ) : (
         <Building
           floorsNumber={floorsNumber}

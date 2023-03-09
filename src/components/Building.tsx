@@ -1,12 +1,20 @@
 import { useRef, useState } from "react";
 import { elevator, floor } from "../libs/types";
-import { calcTime, formatOrdinals, minT } from "../libs/utils";
+import {
+  calcTime,
+  convertMillisecondsToMinutesSeconds,
+  formatOrdinals,
+  minT,
+} from "../libs/utils";
 import Elevator from "./Elevator";
 import "./Building.css";
+import { WAITING_MS } from "../constants/settings";
+
 type Props = {
   floorsNumber: number;
   elevatorsNumber: number;
 };
+
 function Building({ floorsNumber, elevatorsNumber }: Props) {
   const [floorList, setFloorList] = useState<floor[]>(
     Array.from({ length: floorsNumber }).map((e, idx) => ({
@@ -40,8 +48,8 @@ function Building({ floorsNumber, elevatorsNumber }: Props) {
           ? {
               ...floor,
               buttonState: "waiting",
-              // timeToArrive:
-              // elevatorTaskIndex:
+              timeToArrive: calcTime(bestElevator.currentFloor, floorCall),
+              elevatorTaskIndex: bestElevator.index,
             }
           : floor
       );
@@ -86,11 +94,12 @@ function Building({ floorsNumber, elevatorsNumber }: Props) {
             ? {
                 ...floor,
                 buttonState: "arrived",
+                timeToArrive: undefined,
+                elevatorTaskIndex: undefined,
               }
             : floor
         );
       });
-
       const bell = new Audio(require("../assets/bell.mp3"));
       bell.play();
       // update button and elevator to available state after 2 seconds
@@ -111,8 +120,6 @@ function Building({ floorsNumber, elevatorsNumber }: Props) {
               ? {
                   ...floor,
                   buttonState: "call",
-                  timeToArrive: undefined,
-                  elevatorTaskIndex: undefined,
                 }
               : floor
           );
@@ -121,7 +128,7 @@ function Building({ floorsNumber, elevatorsNumber }: Props) {
         if (elevatorCallQueue.current.length) {
           handleElevatorTask(elevatorCallQueue.current.shift()!, bestElevator);
         }
-      }, 2000);
+      }, WAITING_MS);
     }, calcTime(bestElevator.currentFloor, floorCall));
   }
   return (
