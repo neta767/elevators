@@ -1,0 +1,5 @@
+- update readme
+- update from setting
+- change to sass
+- fix call elevator when all busy and show time
+- fix style

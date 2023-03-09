@@ -1,91 +1,16 @@
 .App {
-  background-color: lightgray;
+  background-color: var(--bg);
   display: flex;
   align-items: center;
   flex-direction: column;
   height: 100vh;
 }
 
-.App-header {
+h1 {
   font-size: calc(10px + 2vmin);
-  color: black;
   font-weight: 600;
 }
 
-.elevators, .col{
-  display: flex;
-}
-
-.row {
-  display: flex;
-  flex-direction: column;
-}
-
-.cell {
-  display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid transparent;
-    text-align: center;
-    width: 100px;
-    height: 40px;
-    font-weight: bold;
-}
-
-.cell-with-color {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: rgba(255, 255, 255, 0.8);
-  border: 1px solid lightgray;
-  text-align: center;
-  width: 100px;
-  height: 40px;
-}
-
-svg{
-  width: 20px;
-  z-index: 2;
-    /* background-color: red;
-      position: relative;
-      animation: mymove 5s infinite; */
-}
-
-@keyframes mymove {
-  from {
-    top: 0px;
-  }
-
-  to {
-    top: -200px;
-  }
-}
-
-button{
-color: white;
-border: none;
-border-radius: 3px;
-font-size: large;
-width: 70px;
-height: 25px;
-cursor: pointer;
-box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.096);
-}
-
-.bg{
-box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.096);
-}
-
-.call{
-  background-color: green;
-}
-
-.waiting{
-  background-color: red;
-}
-
-.arrived{
-  background-color: transparent;
-  color: green;
-  border: 1px solid green;
+input{
+  margin: 10px;
 }
