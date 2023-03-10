@@ -1,5 +1,5 @@
-import { ELEVATOR_VELOCITY, FLOOR_HEIGHT, WAITING_MS } from "../constants/settings";
-import { elevator } from "./types";
+import { ELEVATOR_VELOCITY, FLOOR_HEIGHT, WAITING_MS } from "../data/settings";
+import { elevator } from "../data/types";
 
 const pr = new Intl.PluralRules("en-US", { type: "ordinal" });
 const suffixes = new Map([
@@ -43,14 +43,14 @@ export function calcDistance(cur: number, dest: number): number {
     return (cur - dest) * FLOOR_HEIGHT
 }
 
-export function calcArriveTime(cur: number, dest: number, timeToBeAvailable: number | undefined = undefined): number {
+export function calcArriveTime(cur: number, dest: number, timeToBeAvailable: number | null = null): number {
     if (timeToBeAvailable) {
         return Math.abs(calcDistance(cur, dest)) * ELEVATOR_VELOCITY + timeToBeAvailable - d.getTime()
     }
     return Math.abs(calcDistance(cur, dest)) * ELEVATOR_VELOCITY
 
 }
-
-export function calcAvailableTime(cur: number, dest: number, timeToBeAvailable: number | undefined): number {
+//not pure!
+export function calcAvailableTime(cur: number, dest: number, timeToBeAvailable: number | null): number {
     return d.getTime() + calcArriveTime(cur, dest, timeToBeAvailable) + WAITING_MS
 }

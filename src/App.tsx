@@ -11,27 +11,38 @@ function App() {
     <div className="App">
       <h1>Elevator Exercise</h1>
       {!startBuilding ? (
-        <form onSubmit={(e) => setStartBuilding(true)}>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            setStartBuilding(true);
+          }}
+        >
           <label>
             Number Of Elevators:
             <input
               type="number"
-              name="elevatorsNumber"
               value={elevatorsNumber}
               min={1}
               required
-              onChange={(e) => setElevatorsNumber(parseInt(e.target.value))}
+              onChange={(e) =>
+                setElevatorsNumber((v) =>
+                  e.target.validity.valid ? parseInt(e.target.value) : v
+                )
+              }
             />
           </label>
           <label>
             Number Of Floors:
             <input
               type="number"
-              name="floorsNumber"
               value={floorsNumber}
               min={1}
               required
-              onChange={(e) => setFloorsNumber(parseInt(e.target.value))}
+              onChange={(e) =>
+                setFloorsNumber((v) =>
+                  e.target.validity.valid ? parseInt(e.target.value) : v
+                )
+              }
             />
           </label>
           <input type="submit" value="Submit"></input>

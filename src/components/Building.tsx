@@ -1,29 +1,34 @@
-import { useRef, useState } from "react";
-import { elevator, floor, task } from "../libs/types";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { elevator, floor, task } from "../data/types";
 import {
   calcArriveTime,
   calcAvailableTime,
   convertMsToMinSec,
   formatOrdinals,
   getBestElevator,
-} from "../libs/utils";
+} from "../utils";
+import { WAITING_MS } from "../data/settings";
 import Elevator from "./Elevator";
 import "./Building.css";
-import { WAITING_MS } from "../constants/settings";
 
 type Props = {
   floorsNumber: number;
   elevatorsNumber: number;
 };
-
 function Building({ floorsNumber, elevatorsNumber }: Props) {
+  const floorsOrdinalNumerals = useMemo(
+    () =>
+      Array.from({ length: floorsNumber }).map((e, idx) =>
+        formatOrdinals(floorsNumber - 1 - idx)
+      ),
+    [floorsNumber]
+  ); //Ground Floor, 1st, 2nd...
   const [floorList, setFloorList] = useState<floor[]>(
     Array.from({ length: floorsNumber }).map((e, idx) => ({
       index: floorsNumber - 1 - idx,
-      ordinal: formatOrdinals(floorsNumber - 1 - idx),
       buttonState: "call",
-      elevatorTaskIndex: undefined,
-      timeToPresent: undefined,
+      elevatorTaskIndex: null,
+      presentTime: null,
     }))
   );
   const [elevatorsList, setElevatorsList] = useState<elevator[]>(
@@ -32,17 +37,18 @@ function Building({ floorsNumber, elevatorsNumber }: Props) {
       currentFloor: 0,
       destinyFloor: 0,
       elevatorState: "black",
-      timeToBeAvailable: undefined,
+      timeToBeAvailable: null,
     }))
   );
   const elevatorTaskQueue = useRef<task[]>([]);
+  const elevatorsListTimeToBeAvailable = useRef<number[]>([]);
 
   function callElevator(floorCall: number): void {
     //get best elevator be minimal time
     const bestElevator = getBestElevator(elevatorsList, floorCall);
     // update button to waiting state and add time
-    setFloorList((cur: floor[]) => {
-      return cur.map((floor: floor) =>
+    setFloorList((prev) => {
+      return prev.map((floor: floor) =>
         floor.index === floorCall
           ? {
               ...floor,
@@ -60,8 +66,8 @@ function Building({ floorsNumber, elevatorsNumber }: Props) {
       );
     });
     //update elevator time to be available
-    setElevatorsList((cur) => {
-      return cur.map((elevator: elevator) =>
+    setElevatorsList((prev) => {
+      return prev.map((elevator: elevator) =>
         elevator.index === bestElevator.index
           ? {
               ...elevator,
@@ -98,8 +104,8 @@ function Building({ floorsNumber, elevatorsNumber }: Props) {
       (elevator: elevator) => elevator.index === elevatorTaskIndex
     )[0].currentFloor;
     // update the selected elevator for the task
-    setElevatorsList((cur) => {
-      return cur.map((elevator: elevator) =>
+    setElevatorsList((prev) => {
+      return prev.map((elevator: elevator) =>
         elevator.index === elevatorTaskIndex
           ? {
               ...elevator,
@@ -109,10 +115,16 @@ function Building({ floorsNumber, elevatorsNumber }: Props) {
           : elevator
       );
     });
+    // wait(()=>)??
+    // clearTimeout
+    // useEffect(() => {
+    //   // Clear the interval when the component unmounts
+    //   return () => clearTimeout(timerRef.current);
+    // }, []);
     // update button and elevator when arrived
     setTimeout(() => {
-      setElevatorsList((cur) => {
-        return cur.map((elevator: elevator) =>
+      setElevatorsList((prev) => {
+        return prev.map((elevator: elevator) =>
           elevator.index === elevatorTaskIndex
             ? {
                 ...elevator,
@@ -122,14 +134,14 @@ function Building({ floorsNumber, elevatorsNumber }: Props) {
             : elevator
         );
       });
-      setFloorList((cur) => {
-        return cur.map((floor: floor) =>
+      setFloorList((prev) => {
+        return prev.map((floor: floor) =>
           floor.index === floorCall
             ? {
                 ...floor,
                 buttonState: "arrived",
-                timeToArrive: undefined,
-                elevatorTaskIndex: undefined,
+                timeToArrive: null,
+                elevatorTaskIndex: null,
               }
             : floor
         );
@@ -139,19 +151,19 @@ function Building({ floorsNumber, elevatorsNumber }: Props) {
       bell.play();
       // update button and elevator to available state after 2 seconds
       setTimeout(() => {
-        setElevatorsList((cur) => {
-          return cur.map((elevator: elevator) =>
+        setElevatorsList((prev) => {
+          return prev.map((elevator: elevator) =>
             elevator.index === elevatorTaskIndex
               ? {
                   ...elevator,
                   elevatorState: "black",
-                  timeToBeAvailable: undefined,
+                  timeToBeAvailable: null,
                 }
               : elevator
           );
         });
-        setFloorList((cur) => {
-          return cur.map((floor: floor) =>
+        setFloorList((prev) => {
+          return prev.map((floor: floor) =>
             floor.index === floorCall
               ? {
                   ...floor,
@@ -171,9 +183,9 @@ function Building({ floorsNumber, elevatorsNumber }: Props) {
   return (
     <div className="flex">
       <div>
-        {floorList.map((floor: floor) => (
-          <div key={floor.index} className="cell ordinal">
-            {floor.ordinal}
+        {floorsOrdinalNumerals.map((ordinal, index) => (
+          <div key={index} className="cell ordinal">
+            {ordinal}
           </div>
         ))}
       </div>
@@ -189,7 +201,7 @@ function Building({ floorsNumber, elevatorsNumber }: Props) {
                   <Elevator {...elevator}></Elevator>
                 )}
                 {elevator.index === floor.elevatorTaskIndex &&
-                  floor.timeToPresent}
+                  floor.presentTime}
               </div>
             ))}
           </div>

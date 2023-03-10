@@ -1,5 +1,5 @@
-import { elevator } from "../libs/types";
-import { calcDistance, calcArriveTime } from "../libs/utils";
+import { elevator } from "../data/types";
+import { calcDistance, calcArriveTime } from "../utils";
 import "./Elevator.css";
 function Elevator({ currentFloor, destinyFloor, elevatorState }: elevator) {
   return (
