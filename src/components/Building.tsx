@@ -1,10 +1,11 @@
 import { useRef, useState } from "react";
-import { elevator, floor } from "../libs/types";
+import { elevator, floor, task } from "../libs/types";
 import {
-  calcTime,
-  convertMillisecondsToMinutesSeconds,
+  calcArriveTime,
+  calcAvailableTime,
+  convertMsToMinSec,
   formatOrdinals,
-  minT,
+  getBestElevator,
 } from "../libs/utils";
 import Elevator from "./Elevator";
 import "./Building.css";
@@ -21,8 +22,8 @@ function Building({ floorsNumber, elevatorsNumber }: Props) {
       index: floorsNumber - 1 - idx,
       ordinal: formatOrdinals(floorsNumber - 1 - idx),
       buttonState: "call",
-      timeToArrive: undefined,
       elevatorTaskIndex: undefined,
+      timeToPresent: undefined,
     }))
   );
   const [elevatorsList, setElevatorsList] = useState<elevator[]>(
@@ -31,16 +32,14 @@ function Building({ floorsNumber, elevatorsNumber }: Props) {
       currentFloor: 0,
       destinyFloor: 0,
       elevatorState: "black",
+      timeToBeAvailable: undefined,
     }))
   );
-  const elevatorCallQueue = useRef<number[]>([]);
+  const elevatorTaskQueue = useRef<task[]>([]);
 
   function callElevator(floorCall: number): void {
     //get best elevator be minimal time
-    //TODO:fix
-    const bestElevator = elevatorsList.reduce((acc, ele) =>
-      minT(acc, ele, floorCall)
-    );
+    const bestElevator = getBestElevator(elevatorsList, floorCall);
     // update button to waiting state and add time
     setFloorList((cur: floor[]) => {
       return cur.map((floor: floor) =>
@@ -48,25 +47,60 @@ function Building({ floorsNumber, elevatorsNumber }: Props) {
           ? {
               ...floor,
               buttonState: "waiting",
-              timeToArrive: calcTime(bestElevator.currentFloor, floorCall),
               elevatorTaskIndex: bestElevator.index,
+              timeToPresent: convertMsToMinSec(
+                calcArriveTime(
+                  bestElevator.currentFloor,
+                  floorCall,
+                  bestElevator.timeToBeAvailable
+                )
+              ),
             }
           : floor
       );
     });
-    //elevator available
-    if (bestElevator.elevatorState === "black") {
-      handleElevatorTask(floorCall, bestElevator);
-    } else {
-      elevatorCallQueue.current.push(floorCall);
-    }
-  }
-
-  function handleElevatorTask(floorCall: number, bestElevator: elevator) {
-    // update the selected elevator for the task
+    //update elevator time to be available
     setElevatorsList((cur) => {
       return cur.map((elevator: elevator) =>
         elevator.index === bestElevator.index
+          ? {
+              ...elevator,
+              timeToBeAvailable: calcAvailableTime(
+                bestElevator.currentFloor,
+                floorCall,
+                bestElevator.timeToBeAvailable
+              ),
+            }
+          : elevator
+      );
+    });
+    //elevator available
+    if (bestElevator.elevatorState === "black") {
+      handleElevatorTask({
+        floorCall: floorCall,
+        elevatorTaskIndex: bestElevator.index,
+        elevatorTimeToBeAvailable: bestElevator.timeToBeAvailable,
+      });
+    } else {
+      elevatorTaskQueue.current.push({
+        floorCall: floorCall,
+        elevatorTaskIndex: bestElevator.index,
+        elevatorTimeToBeAvailable: bestElevator.timeToBeAvailable,
+      });
+    }
+  }
+  function handleElevatorTask({
+    floorCall,
+    elevatorTaskIndex,
+    elevatorTimeToBeAvailable,
+  }: task): void {
+    const currentFloor = elevatorsList.filter(
+      (elevator: elevator) => elevator.index === elevatorTaskIndex
+    )[0].currentFloor;
+    // update the selected elevator for the task
+    setElevatorsList((cur) => {
+      return cur.map((elevator: elevator) =>
+        elevator.index === elevatorTaskIndex
           ? {
               ...elevator,
               elevatorState: "red",
@@ -79,7 +113,7 @@ function Building({ floorsNumber, elevatorsNumber }: Props) {
     setTimeout(() => {
       setElevatorsList((cur) => {
         return cur.map((elevator: elevator) =>
-          elevator.index === bestElevator.index
+          elevator.index === elevatorTaskIndex
             ? {
                 ...elevator,
                 currentFloor: floorCall,
@@ -100,16 +134,18 @@ function Building({ floorsNumber, elevatorsNumber }: Props) {
             : floor
         );
       });
+      //TODO:fix
       const bell = new Audio(require("../assets/bell.mp3"));
       bell.play();
       // update button and elevator to available state after 2 seconds
       setTimeout(() => {
         setElevatorsList((cur) => {
           return cur.map((elevator: elevator) =>
-            elevator.index === bestElevator.index
+            elevator.index === elevatorTaskIndex
               ? {
                   ...elevator,
                   elevatorState: "black",
+                  timeToBeAvailable: undefined,
                 }
               : elevator
           );
@@ -125,11 +161,12 @@ function Building({ floorsNumber, elevatorsNumber }: Props) {
           );
         });
         // after finished the task check for other call and handle them
-        if (elevatorCallQueue.current.length) {
-          handleElevatorTask(elevatorCallQueue.current.shift()!, bestElevator);
+        if (elevatorTaskQueue.current.length) {
+          const task: task = elevatorTaskQueue.current.shift()!;
+          handleElevatorTask(task);
         }
       }, WAITING_MS);
-    }, calcTime(bestElevator.currentFloor, floorCall));
+    }, calcArriveTime(currentFloor, floorCall, elevatorTimeToBeAvailable));
   }
   return (
     <div className="flex">
@@ -151,9 +188,8 @@ function Building({ floorsNumber, elevatorsNumber }: Props) {
                 {elevator.currentFloor === floor.index && (
                   <Elevator {...elevator}></Elevator>
                 )}
-                {elevator.destinyFloor === floor.index &&
-                  elevator.index === floor.elevatorTaskIndex &&
-                  floor.timeToArrive}
+                {elevator.index === floor.elevatorTaskIndex &&
+                  floor.timeToPresent}
               </div>
             ))}
           </div>

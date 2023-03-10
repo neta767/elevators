@@ -1,12 +1,12 @@
 import { elevator } from "../libs/types";
-import { calcDistance, calcTime } from "../libs/utils";
+import { calcDistance, calcArriveTime } from "../libs/utils";
 import "./Elevator.css";
 function Elevator({ currentFloor, destinyFloor, elevatorState }: elevator) {
   return (
     <svg
       style={{
         transform: `translateY(${calcDistance(currentFloor, destinyFloor)}px)`,
-        transitionDuration: `${calcTime(currentFloor, destinyFloor)}ms`,
+        transitionDuration: `${calcArriveTime(currentFloor, destinyFloor)}ms`,
         animationTimingFunction: "linear",
       }}
       className={elevatorState}

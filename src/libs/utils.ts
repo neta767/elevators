@@ -1,4 +1,4 @@
-import { ELEVATOR_VELOCITY, FLOOR_HEIGHT } from "../constants/settings";
+import { ELEVATOR_VELOCITY, FLOOR_HEIGHT, WAITING_MS } from "../constants/settings";
 import { elevator } from "./types";
 
 const pr = new Intl.PluralRules("en-US", { type: "ordinal" });
@@ -8,7 +8,8 @@ const suffixes = new Map([
     ["few", "rd"],
     ["other", "th"],
 ]);
-export function formatOrdinals(n: number) {
+const d = new Date()
+export function formatOrdinals(n: number): string {
     if (n === 0) {
         return "Ground Floor";
     }
@@ -17,7 +18,7 @@ export function formatOrdinals(n: number) {
     return `${n}${suffix}`;
 };
 
-export function convertMillisecondsToMinutesSeconds(milliseconds: number) {
+export function convertMsToMinSec(milliseconds: number): string {
     const minutes = Math.floor((milliseconds % 3600000) / 60000);
     const seconds = Math.floor(((milliseconds % 360000) % 60000) / 1000);
     if (!minutes) {
@@ -26,21 +27,30 @@ export function convertMillisecondsToMinutesSeconds(milliseconds: number) {
     return `${minutes} min. ${seconds} sec.`;
 }
 
-export function minT(acc: elevator, ele: elevator, callFloor: number) {
-    if (
-        Math.abs(acc.currentFloor - callFloor) <
-        Math.abs(ele.currentFloor - callFloor)
-    ) {
-        return acc;
-    } else {
-        return ele;
-    }
+export function getBestElevator(elevatorsList: elevator[], callFloor: number): elevator {
+    return elevatorsList.reduce((ele1: elevator, ele2: elevator) => {
+        let time1 = calcArriveTime(ele1.currentFloor, callFloor, ele1.timeToBeAvailable)
+        let time2 = calcArriveTime(ele2.currentFloor, callFloor, ele2.timeToBeAvailable)
+        if (time1 < time2) {
+            return ele1
+        } else {
+            return ele2
+        }
+    })
 }
 
-export function calcDistance(cur: number, dest: number) {
+export function calcDistance(cur: number, dest: number): number {
     return (cur - dest) * FLOOR_HEIGHT
 }
 
-export function calcTime(cur: number, dest: number) {
+export function calcArriveTime(cur: number, dest: number, timeToBeAvailable: number | undefined = undefined): number {
+    if (timeToBeAvailable) {
+        return Math.abs(calcDistance(cur, dest)) * ELEVATOR_VELOCITY + timeToBeAvailable - d.getTime()
+    }
     return Math.abs(calcDistance(cur, dest)) * ELEVATOR_VELOCITY
+
+}
+
+export function calcAvailableTime(cur: number, dest: number, timeToBeAvailable: number | undefined): number {
+    return d.getTime() + calcArriveTime(cur, dest, timeToBeAvailable) + WAITING_MS
 }
