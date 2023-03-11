@@ -1,16 +1,14 @@
 export type elevator = {
-    index: number;
     currentFloor: number;
     destinyFloor: number;
     elevatorState: "red" | "green" | "black";
-    availableTime: number | null;
+    availableTime: number;
 };
 
 export type floor = {
-    index: number;
     buttonState: "call" | "waiting" | "arrived";
-    elevatorTaskIndex: number | null;
-    presentTime: string | null;
+    elevatorTaskId: number;
+    presentTime: string;
 };
 
 export type task = {
@@ -18,3 +16,8 @@ export type task = {
     elevatorTaskIndex: number;
     elevatorAvailableTime: number | null;
 }
+
+export type Props = {
+    floorsNumber: number;
+    elevatorsNumber: number;
+};

@@ -2,6 +2,11 @@
     display: flex;
 }
 
+.col{
+    display: flex;
+    flex-direction: column-reverse;
+}
+
 .cell {
     display: flex;
     align-items: center;

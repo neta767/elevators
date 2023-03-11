@@ -1,5 +1,6 @@
 import { ELEVATOR_VELOCITY, FLOOR_HEIGHT, WAITING_MS } from "../data/settings";
 import { elevator } from "../data/types";
+import elevatorsStore, { ValuesElevatorsStore } from "../store/elevatorsStore";
 
 const pr = new Intl.PluralRules("en-US", { type: "ordinal" });
 const suffixes = new Map([
@@ -27,14 +28,14 @@ export function convertMsToMinSec(milliseconds: number): string {
     return `${minutes} min. ${seconds} sec.`;
 }
 
-export function getBestElevator(elevatorsList: elevator[], callFloor: number): elevator {
-    return elevatorsList.reduce((elevator1: elevator, elevator2: elevator) => {
-        let time1 = calcDuration(elevator1.currentFloor, callFloor, elevator1.availableTime)
-        let time2 = calcDuration(elevator2.currentFloor, callFloor, elevator2.availableTime)
+export function getBestElevatorId(floorCallId: number): number {
+    return Array.from(elevatorsStore.getState().keys()).reduce((elevatorId1: number, elevatorId2: number) => {
+        let time1 = calcDuration(elevatorId1, floorCallId)
+        let time2 = calcDuration(elevatorId2, floorCallId)
         if (time1 < time2) {
-            return elevator1
+            return elevatorId1
         } else {
-            return elevator2
+            return elevatorId2
         }
     })
 }
@@ -43,17 +44,20 @@ export function calcDistance(currentFloor: number, destinyFloor: number): number
     return (currentFloor - destinyFloor) * FLOOR_HEIGHT
 }
 
-export function calcDuration(currentFloor: number, destinyFloor: number, timeToBeAvailable: number | null = null): number {
-    if (timeToBeAvailable) {
-        return Math.abs(calcDistance(currentFloor, destinyFloor)) * ELEVATOR_VELOCITY + timeToBeAvailable - d.getTime()
+export function calcDuration(elevatorId: number, destinyFloor: number): number {
+    const t = elevatorsStore.getState().get(elevatorId)
+    if (t?.currentFloor && t?.availableTime) {
+        return Math.abs(calcDistance(t.currentFloor, destinyFloor)) * ELEVATOR_VELOCITY + t.availableTime - d.getTime()
     }
-    return Math.abs(calcDistance(currentFloor, destinyFloor)) * ELEVATOR_VELOCITY
-
+    if (t?.currentFloor) {
+        return Math.abs(calcDistance(t.currentFloor, destinyFloor)) * ELEVATOR_VELOCITY
+    }
+    return 0
 }
 //not pure!
-export function calcAvailableTime(currentFloor: number, destinyFloor: number, timeToBeAvailable: number | null): number {
-    return d.getTime() + calcDuration(currentFloor, destinyFloor, timeToBeAvailable) + WAITING_MS
-}
+// export function calcAvailableTime(currentFloor: number, destinyFloor: number, timeToBeAvailable: number | null): number {
+//     return d.getTime() + calcDuration(currentFloor, destinyFloor, timeToBeAvailable) + WAITING_MS
+// }
 
 export function calcDelay(timeToBeAvailable: number | null): number {
     if (timeToBeAvailable) {
