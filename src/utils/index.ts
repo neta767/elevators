@@ -28,29 +28,36 @@ export function convertMsToMinSec(milliseconds: number): string {
 }
 
 export function getBestElevator(elevatorsList: elevator[], callFloor: number): elevator {
-    return elevatorsList.reduce((ele1: elevator, ele2: elevator) => {
-        let time1 = calcArriveTime(ele1.currentFloor, callFloor, ele1.timeToBeAvailable)
-        let time2 = calcArriveTime(ele2.currentFloor, callFloor, ele2.timeToBeAvailable)
+    return elevatorsList.reduce((elevator1: elevator, elevator2: elevator) => {
+        let time1 = calcDuration(elevator1.currentFloor, callFloor, elevator1.availableTime)
+        let time2 = calcDuration(elevator2.currentFloor, callFloor, elevator2.availableTime)
         if (time1 < time2) {
-            return ele1
+            return elevator1
         } else {
-            return ele2
+            return elevator2
         }
     })
 }
 
-export function calcDistance(cur: number, dest: number): number {
-    return (cur - dest) * FLOOR_HEIGHT
+export function calcDistance(currentFloor: number, destinyFloor: number): number {
+    return (currentFloor - destinyFloor) * FLOOR_HEIGHT
 }
 
-export function calcArriveTime(cur: number, dest: number, timeToBeAvailable: number | null = null): number {
+export function calcDuration(currentFloor: number, destinyFloor: number, timeToBeAvailable: number | null = null): number {
     if (timeToBeAvailable) {
-        return Math.abs(calcDistance(cur, dest)) * ELEVATOR_VELOCITY + timeToBeAvailable - d.getTime()
+        return Math.abs(calcDistance(currentFloor, destinyFloor)) * ELEVATOR_VELOCITY + timeToBeAvailable - d.getTime()
     }
-    return Math.abs(calcDistance(cur, dest)) * ELEVATOR_VELOCITY
+    return Math.abs(calcDistance(currentFloor, destinyFloor)) * ELEVATOR_VELOCITY
 
 }
 //not pure!
-export function calcAvailableTime(cur: number, dest: number, timeToBeAvailable: number | null): number {
-    return d.getTime() + calcArriveTime(cur, dest, timeToBeAvailable) + WAITING_MS
+export function calcAvailableTime(currentFloor: number, destinyFloor: number, timeToBeAvailable: number | null): number {
+    return d.getTime() + calcDuration(currentFloor, destinyFloor, timeToBeAvailable) + WAITING_MS
+}
+
+export function calcDelay(timeToBeAvailable: number | null): number {
+    if (timeToBeAvailable) {
+        return timeToBeAvailable - d.getTime()
+    }
+    return 0
 }

@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { elevator, floor, task } from "../data/types";
 import {
-  calcArriveTime,
+  calcDuration,
   calcAvailableTime,
   convertMsToMinSec,
   formatOrdinals,
@@ -37,13 +37,13 @@ function Building({ floorsNumber, elevatorsNumber }: Props) {
       currentFloor: 0,
       destinyFloor: 0,
       elevatorState: "black",
-      timeToBeAvailable: null,
+      availableTime: null,
     }))
   );
   const elevatorTaskQueue = useRef<task[]>([]);
-  const elevatorsListTimeToBeAvailable = useRef<number[]>([]);
+  const elevatorsListavailableTime = useRef<number[]>([]);
 
-  function callElevator(floorCall: number): void {
+  function elevatorCall(floorCall: number): void {
     //get best elevator be minimal time
     const bestElevator = getBestElevator(elevatorsList, floorCall);
     // update button to waiting state and add time
@@ -55,10 +55,10 @@ function Building({ floorsNumber, elevatorsNumber }: Props) {
               buttonState: "waiting",
               elevatorTaskIndex: bestElevator.index,
               timeToPresent: convertMsToMinSec(
-                calcArriveTime(
+                calcDuration(
                   bestElevator.currentFloor,
                   floorCall,
-                  bestElevator.timeToBeAvailable
+                  bestElevator.availableTime
                 )
               ),
             }
@@ -71,34 +71,32 @@ function Building({ floorsNumber, elevatorsNumber }: Props) {
         elevator.index === bestElevator.index
           ? {
               ...elevator,
-              timeToBeAvailable: calcAvailableTime(
+              availableTime: calcAvailableTime(
                 bestElevator.currentFloor,
                 floorCall,
-                bestElevator.timeToBeAvailable
+                bestElevator.availableTime
               ),
             }
           : elevator
       );
     });
+    console.log(bestElevator.availableTime);
+    const task: task = {
+      floorCall: floorCall,
+      elevatorTaskIndex: bestElevator.index,
+      elevatorAvailableTime: bestElevator.availableTime,
+    };
     //elevator available
     if (bestElevator.elevatorState === "black") {
-      handleElevatorTask({
-        floorCall: floorCall,
-        elevatorTaskIndex: bestElevator.index,
-        elevatorTimeToBeAvailable: bestElevator.timeToBeAvailable,
-      });
+      handleElevatorTask(task);
     } else {
-      elevatorTaskQueue.current.push({
-        floorCall: floorCall,
-        elevatorTaskIndex: bestElevator.index,
-        elevatorTimeToBeAvailable: bestElevator.timeToBeAvailable,
-      });
+      elevatorTaskQueue.current.push(task);
     }
   }
   function handleElevatorTask({
     floorCall,
     elevatorTaskIndex,
-    elevatorTimeToBeAvailable,
+    elevatorAvailableTime,
   }: task): void {
     const currentFloor = elevatorsList.filter(
       (elevator: elevator) => elevator.index === elevatorTaskIndex
@@ -157,7 +155,7 @@ function Building({ floorsNumber, elevatorsNumber }: Props) {
               ? {
                   ...elevator,
                   elevatorState: "black",
-                  timeToBeAvailable: null,
+                  availableTime: null,
                 }
               : elevator
           );
@@ -178,7 +176,7 @@ function Building({ floorsNumber, elevatorsNumber }: Props) {
           handleElevatorTask(task);
         }
       }, WAITING_MS);
-    }, calcArriveTime(currentFloor, floorCall, elevatorTimeToBeAvailable));
+    }, calcDuration(currentFloor, floorCall, elevatorAvailableTime));
   }
   return (
     <div className="flex">
@@ -211,7 +209,7 @@ function Building({ floorsNumber, elevatorsNumber }: Props) {
         {floorList.map((floor: floor) => (
           <div key={floor.index} className="cell">
             <button
-              onClick={() => callElevator(floor.index)}
+              onClick={() => elevatorCall(floor.index)}
               className={`${floor.buttonState} shadow`}
             >
               {floor.buttonState}
