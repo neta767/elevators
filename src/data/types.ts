@@ -9,15 +9,11 @@ export type floor = {
     buttonState: "call" | "waiting" | "arrived";
     elevatorTaskId: number;
     presentTime: string;
+    elevatorAvailableTime: number;
 };
 
 export type task = {
-    floorCall: number,
-    elevatorTaskIndex: number;
-    elevatorAvailableTime: number | null;
+    floorId: number,
+    elevatorId: number;
+    // elevatorAvailableTime: number;
 }
-
-export type Props = {
-    floorsNumber: number;
-    elevatorsNumber: number;
-};

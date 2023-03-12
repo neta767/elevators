@@ -1,16 +1,20 @@
-import elevatorsStore from "../store/elevatorsStore";
-import floorsStore from "../store/floorsStore";
+import { elevator, floor } from "../data/types";
 import Cell from "./Cell";
-
-function Elevators() {
+type Props = {
+  floorsArray: floor[];
+  elevatorsArray: elevator[];
+};
+function Elevators({ floorsArray, elevatorsArray }: Props) {
   return (
     <div className="shadow flex">
-      {Array.from(elevatorsStore.getState().keys()).map((elevatorId) => (
+      {elevatorsArray.map((elevator, elevatorId) => (
         <div className="col" key={elevatorId}>
-          {Array.from(floorsStore.getState().keys()).map((floorId) => (
+          {floorsArray.map((floor, floorId) => (
             <Cell
               floorId={floorId}
               elevatorId={elevatorId}
+              floor={floor}
+              elevator={elevator}
               key={floorId.toString() + elevatorId.toString()}
             />
           ))}

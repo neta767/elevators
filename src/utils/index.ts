@@ -1,6 +1,5 @@
 import { ELEVATOR_VELOCITY, FLOOR_HEIGHT, WAITING_MS } from "../data/settings";
 import { elevator } from "../data/types";
-import elevatorsStore, { ValuesElevatorsStore } from "../store/elevatorsStore";
 
 const pr = new Intl.PluralRules("en-US", { type: "ordinal" });
 const suffixes = new Map([
@@ -28,40 +27,43 @@ export function convertMsToMinSec(milliseconds: number): string {
     return `${minutes} min. ${seconds} sec.`;
 }
 
-export function getBestElevatorId(floorCallId: number): number {
-    return Array.from(elevatorsStore.getState().keys()).reduce((elevatorId1: number, elevatorId2: number) => {
-        let time1 = calcDuration(elevatorId1, floorCallId)
-        let time2 = calcDuration(elevatorId2, floorCallId)
+// return px Y distance to transform the elevator
+export function calcDistanceTransform(currentFloor: number, destinyFloor: number): number {
+    return (currentFloor - destinyFloor) * FLOOR_HEIGHT
+}
+// return ms duration for the elevator transition animation
+export function calcDurationTransform(elevator: elevator, destinyFloor: number): number {
+    return Math.abs(calcDistanceTransform(elevator.currentFloor, destinyFloor)) / ELEVATOR_VELOCITY
+}
+
+// return ms to delay the elevator transition animation
+export function calcDelayTransition(availableTime: number): number {
+    if (availableTime) {
+        return availableTime - d.getTime()
+    }
+    return 0
+}
+
+// return the time in ms that elevator will get to destiny considering if it is not available now
+export function calcDurationTask(elevator: elevator, destinyFloor: number, availableTime: number = elevator.availableTime): number {
+    if (availableTime) {
+        return calcDurationTransform(elevator, destinyFloor) + availableTime - d.getTime()
+    }
+    return calcDurationTransform(elevator, destinyFloor)
+}
+// return the time in ms that elevator will be available
+export function calcAvailableTime(elevator: elevator, destinyFloor: number): number {
+    return d.getTime() + calcDurationTask(elevator, destinyFloor) + WAITING_MS
+}
+
+export function getBestElevatorId(floorCallId: number, elevatorsArray: elevator[]): number {
+    return Array.from(elevatorsArray.keys()).reduce((elevatorId1: number, elevatorId2: number) => {
+        let time1 = calcDurationTask(elevatorsArray[elevatorId1], floorCallId)
+        let time2 = calcDurationTask(elevatorsArray[elevatorId2], floorCallId)
         if (time1 < time2) {
             return elevatorId1
         } else {
             return elevatorId2
         }
     })
-}
-
-export function calcDistance(currentFloor: number, destinyFloor: number): number {
-    return (currentFloor - destinyFloor) * FLOOR_HEIGHT
-}
-
-export function calcDuration(elevatorId: number, destinyFloor: number): number {
-    const t = elevatorsStore.getState().get(elevatorId)
-    if (t?.currentFloor && t?.availableTime) {
-        return Math.abs(calcDistance(t.currentFloor, destinyFloor)) * ELEVATOR_VELOCITY + t.availableTime - d.getTime()
-    }
-    if (t?.currentFloor) {
-        return Math.abs(calcDistance(t.currentFloor, destinyFloor)) * ELEVATOR_VELOCITY
-    }
-    return 0
-}
-//not pure!
-// export function calcAvailableTime(currentFloor: number, destinyFloor: number, timeToBeAvailable: number | null): number {
-//     return d.getTime() + calcDuration(currentFloor, destinyFloor, timeToBeAvailable) + WAITING_MS
-// }
-
-export function calcDelay(timeToBeAvailable: number | null): number {
-    if (timeToBeAvailable) {
-        return timeToBeAvailable - d.getTime()
-    }
-    return 0
 }

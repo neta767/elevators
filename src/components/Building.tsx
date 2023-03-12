@@ -221,7 +221,10 @@
 import FloorsOrdinalNumerals from "./FloorsOrdinalNumerals";
 import "./Building.css";
 import ElevatorsSystem from "./ElevatorsSystem";
-import { Props } from "../data/types";
+type Props = {
+  floorsNumber: number;
+  elevatorsNumber: number;
+};
 
 function Building({ floorsNumber, elevatorsNumber }: Props) {
   return (

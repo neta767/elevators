@@ -40,7 +40,6 @@ button {
     font-size: large;
     width: 70px;
     height: 25px;
-    cursor: pointer;
 }
 
 .shadow {
@@ -49,6 +48,7 @@ button {
 
 .call {
     background-color: var(--green);
+    cursor: pointer;
 }
 
 .waiting {

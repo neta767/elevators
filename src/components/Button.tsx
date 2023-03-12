@@ -5,8 +5,11 @@ type Props = {
 };
 function Button({ id, state, elevatorCall }: Props) {
   return (
-    <button onClick={() => elevatorCall(id)}>
+    <button
+      disabled={state !== "call"}
+      onClick={() => elevatorCall(id)}
       className={`${state} shadow`}
+    >
       {state}
     </button>
   );
