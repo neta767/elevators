@@ -46,7 +46,7 @@ function ElevatorsSystem({ floorsNumber, elevatorsNumber }: Props) {
       elevatorTaskId: bestElevatorId,
       presentTime: convertMsToMinSec(
         calcDurationTask(
-          bestElevator.currentFloor,
+          bestElevator.destinyFloor,
           floorCallId,
           elevatorsAvailableTimeArray.current[bestElevatorId]
         )
@@ -81,9 +81,6 @@ function ElevatorsSystem({ floorsNumber, elevatorsNumber }: Props) {
     currentFloor: number,
     { floorId, elevatorId }: task
   ): void {
-    const elevator = elevatorsArray[elevatorId];
-    // update manually because array will only update after all updates
-    elevator.currentFloor = currentFloor;
     // update the selected elevator for the task
     elevatorsUpdate(elevatorId, {
       elevatorState: "red",
@@ -120,7 +117,7 @@ function ElevatorsSystem({ floorsNumber, elevatorsNumber }: Props) {
           }
         }
       }, WAITING_MS);
-    }, calcDurationTask(elevator.currentFloor, floorId, 0));
+    }, calcDurationTask(currentFloor, floorId, 0));
   }
   return (
     <div className="flex">

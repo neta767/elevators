@@ -62,7 +62,7 @@ export function calcDelayTransition(availableTime: number): number {
     return 0
 }
 /**
- * @param elevator 
+ * @param currentFloor 
  * @param destinyFloor 
  * @param availableTime 
  * @returns the time in ms that elevator will get to destiny considering if it is not available now
