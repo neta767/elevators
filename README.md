@@ -1,17 +1,19 @@
 # Elevators
 
-### An elevators system with the ability to define floors number and elevators number.
+### Elevator system with the ability to define floors number and elevators number.
 
-## Functionally
+## Functionality
 
-- Configuration form for number of elevators and numbers of floors
-- Able to call from each floor to elevator just when in call state
+- Configuration for the desired number of elevators and numbers of floors
+- Able to call an elevator from any floor
 - Display the time it will take the elevator to reach the designated floor
 - Display the elevators and floors button status (call/arrived/waiting)
-- Make a sound when the elevator reaches the floor
+- Play a sound when the elevator reaches the designated floor
 
 [screen-capture.webm](https://user-images.githubusercontent.com/59369034/225016970-df01ffd8-959c-4b97-bd1a-d5f4231c180d.webm|width=100)
+
 ###
+
 [screen-capture (1).webm](https://user-images.githubusercontent.com/59369034/225017193-8025a976-d1be-404c-ba74-324447615065.webm|width=100)
 
 ## Built with
