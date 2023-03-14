@@ -26,7 +26,7 @@ function App() {
               required
               onChange={(e) =>
                 setElevatorsNumber((v) =>
-                  e.target.validity.valid ? parseInt(e.target.value) : v
+                  e.target.validity.valid ? parseInt(e.target.value, 10) : v
                 )
               }
             />
@@ -40,7 +40,7 @@ function App() {
               required
               onChange={(e) =>
                 setFloorsNumber((v) =>
-                  e.target.validity.valid ? parseInt(e.target.value) : v
+                  e.target.validity.valid ? parseInt(e.target.value, 10) : v
                 )
               }
             />
