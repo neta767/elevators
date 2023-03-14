@@ -2,7 +2,6 @@ export type elevator = {
     currentFloor: number;
     destinyFloor: number;
     elevatorState: "red" | "green" | "black";
-    availableTime: number;
 };
 
 export type floor = {
@@ -15,5 +14,4 @@ export type floor = {
 export type task = {
     floorId: number,
     elevatorId: number;
-    // elevatorAvailableTime: number;
 }

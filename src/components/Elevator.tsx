@@ -11,6 +11,7 @@ type Props = {
 };
 function Elevator({ elevator, availableTime }: Props) {
   const { currentFloor, destinyFloor, elevatorState } = elevator;
+
   return (
     <svg
       style={{
@@ -19,7 +20,7 @@ function Elevator({ elevator, availableTime }: Props) {
           destinyFloor
         )}px)`,
         transition: `transform ${calcDurationTransform(
-          elevator,
+          currentFloor,
           destinyFloor
         )}ms linear ${calcDelayTransition(availableTime)}ms`,
       }}
