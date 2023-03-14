@@ -1,0 +1,11 @@
+.green{
+    fill: var(--green);
+}
+
+.red {
+    fill: var(--red);
+}
+
+.black{
+    fill: black;
+}

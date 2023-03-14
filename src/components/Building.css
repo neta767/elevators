@@ -1,0 +1,62 @@
+.flex {
+    display: flex;
+}
+
+.col{
+    display: flex;
+    flex-direction: column-reverse;
+}
+
+.cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid transparent;
+    text-align: center;
+    width: 100px;
+    height: 40px;
+}
+
+.ordinal {
+    justify-content: end;
+    padding-right: 20px;
+    font-weight: bold;
+}
+
+.flat {
+    background-color:white;
+    border: 1px solid var(--bg);
+    text-align: center;
+}
+
+svg {
+    width: 30px;
+}
+
+button {
+    color: white;
+    border: none;
+    border-radius: 3px;
+    font-size: large;
+    width: 70px;
+    height: 25px;
+}
+
+.shadow {
+    box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.096);
+}
+
+.call {
+    background-color: var(--green);
+    cursor: pointer;
+}
+
+.waiting {
+    background-color: var(--red);
+}
+
+.arrived {
+    background-color: transparent;
+    color: var(--green);
+    border: 1px solid var(--green);
+}
