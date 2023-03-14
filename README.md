@@ -10,8 +10,7 @@
 - Display the elevators and floors button status (call/arrived/waiting)
 - Make a sound when the elevator reaches the floor
 
-[screen-capture.webm](https://user-images.githubusercontent.com/59369034/225016970-df01ffd8-959c-4b97-bd1a-d5f4231c180d.webm)
-[screen-capture (1).webm](https://user-images.githubusercontent.com/59369034/225017004-ad7d5ae9-ed58-40e8-8c48-9f0ee8b01784.webm)
+[screen-capture.webm](https://user-images.githubusercontent.com/59369034/225016970-df01ffd8-959c-4b97-bd1a-d5f4231c180d.webm|width=100)
 
 ## Built with
 
