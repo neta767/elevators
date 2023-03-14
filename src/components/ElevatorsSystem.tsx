@@ -11,7 +11,7 @@ import {
 } from "../utils";
 import Buttons from "./Buttons";
 import Elevators from "./Elevators";
-
+import audio from "../assets/bell.mp3";
 type Props = {
   floorsNumber: number;
   elevatorsNumber: number;
@@ -79,7 +79,7 @@ function ElevatorsSystem({ floorsNumber, elevatorsNumber }: Props) {
         elevatorTaskId: -1,
       });
       //TODO:fix
-      const bell = new Audio(require("../assets/bell.mp3"));
+      const bell = new Audio(audio);
       bell.play();
       // update button and elevator to available state after WAITING_MS
       setTimeout(() => {

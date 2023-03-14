@@ -1,2 +1,0 @@
-- update readme
-- fix call elevator when all busy and show time
