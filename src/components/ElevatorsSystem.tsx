@@ -12,6 +12,7 @@ import {
 import Buttons from "./Buttons";
 import Elevators from "./Elevators";
 import audio from "../assets/bell.mp3";
+const d = new Date();
 
 type Props = {
   floorsNumber: number;
@@ -46,7 +47,7 @@ function ElevatorsSystem({ floorsNumber, elevatorsNumber }: Props) {
       elevatorTaskId: bestElevatorId,
       presentTime: convertMsToMinSec(
         calcDurationTask(
-          bestElevator.currentFloor,
+          bestElevator.destinyFloor,
           floorCallId,
           elevatorsAvailableTimeArray.current[bestElevatorId]
         )
@@ -81,9 +82,6 @@ function ElevatorsSystem({ floorsNumber, elevatorsNumber }: Props) {
     currentFloor: number,
     { floorId, elevatorId }: task
   ): void {
-    const elevator = elevatorsArray[elevatorId];
-    // update manually because array will only update after all updates
-    elevator.currentFloor = currentFloor;
     // update the selected elevator for the task
     elevatorsUpdate(elevatorId, {
       elevatorState: "red",
@@ -91,6 +89,11 @@ function ElevatorsSystem({ floorsNumber, elevatorsNumber }: Props) {
     });
     // update button and elevator when arrived
     setTimeout(() => {
+      elevatorsAvailableTimeArray.current[elevatorId] -= calcDurationTask(
+        currentFloor,
+        floorId,
+        0
+      );
       elevatorsUpdate(elevatorId, {
         currentFloor: floorId,
         elevatorState: "green",
@@ -104,7 +107,7 @@ function ElevatorsSystem({ floorsNumber, elevatorsNumber }: Props) {
       bell.play();
       // update button and elevator to available state after WAITING_MS
       setTimeout(() => {
-        elevatorsAvailableTimeArray.current[elevatorId] = 0;
+        elevatorsAvailableTimeArray.current[elevatorId] -= WAITING_MS;
         elevatorsUpdate(elevatorId, {
           elevatorState: "black",
         });
@@ -120,7 +123,7 @@ function ElevatorsSystem({ floorsNumber, elevatorsNumber }: Props) {
           }
         }
       }, WAITING_MS);
-    }, calcDurationTask(elevator.currentFloor, floorId, 0));
+    }, calcDurationTask(currentFloor, floorId, 0));
   }
   return (
     <div className="flex">

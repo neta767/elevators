@@ -3,8 +3,7 @@ import "./App.css";
 import Building from "./components/Building";
 
 function App() {
-  //update after submitted setting for the building
-  const [startBuilding, setStartBuilding] = useState(false);
+  const [startBuilding, setStartBuilding] = useState(false); // update after submitted setting for the building
   const [elevatorsNumber, setElevatorsNumber] = useState(5);
   const [floorsNumber, setFloorsNumber] = useState(10);
   return (

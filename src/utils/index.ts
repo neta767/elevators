@@ -56,19 +56,21 @@ export function calcDurationTransform(currentFloor: number, destinyFloor: number
  * @returns ms to delay the elevator transition animation
  */
 export function calcDelayTransition(availableTime: number): number {
-    if (availableTime) {
+    // elevator in a task
+    if ((availableTime - d.getTime()) > 0) {
         return availableTime - d.getTime()
     }
     return 0
 }
 /**
- * @param elevator 
+ * @param currentFloor 
  * @param destinyFloor 
  * @param availableTime 
  * @returns the time in ms that elevator will get to destiny considering if it is not available now
  */
 export function calcDurationTask(currentFloor: number, destinyFloor: number, availableTime: number): number {
-    if (availableTime) {
+    // elevator in a task
+    if ((availableTime - d.getTime()) > 0) {
         return calcDurationTransform(currentFloor, destinyFloor) + availableTime - d.getTime()
     }
     return calcDurationTransform(currentFloor, destinyFloor)
